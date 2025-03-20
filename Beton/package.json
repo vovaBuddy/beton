@@ -1,0 +1,14 @@
+﻿{
+	"name": "com.vovabuddy.beton",
+	"displayName": "Beton",
+	"author": { "name": "vovabuddy", "url": "https://github.com/vovaBuddy" },
+	"version": "0.0.1.1",
+	"unity": "2022.3",
+	"description": "Unity architecture framework.",
+	"keywords": [ "Feature", "StateMachine", "State", "Beton" ],
+	"license": "MIT",
+	"category": "Architecture",
+	"dependencies": {
+		"com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+	}
+}
