@@ -12,12 +12,9 @@ namespace Beton.Core.Features
         private IContext _context;
         private Dictionary<Type, object> _initializables = new();
         
-        protected virtual async UniTask OnInit()
-        {
-            await UniTask.CompletedTask;
-        }
+        protected virtual void InjectDependencies() { }
         
-        protected virtual async UniTask InitializeDependencies()
+        protected virtual async UniTask OnInit()
         {
             await UniTask.CompletedTask;
         }
@@ -39,8 +36,8 @@ namespace Beton.Core.Features
         {
             _context = stateContext;
 
-            await InitializeDependencies();
-            
+            InjectDependencies();
+
             await OnInit();
             
             foreach (var (type, obj) in _initializables)
@@ -52,6 +49,8 @@ namespace Beton.Core.Features
         public async UniTask Refresh(IContext prevStateContext, IContext newStateContext)
         {
             _context = newStateContext;
+
+            InjectDependencies();
             
             await OnRefresh();
             

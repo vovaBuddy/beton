@@ -6,6 +6,8 @@ namespace Beton.Core.Features
     public abstract class Feature : IFeature
     {
         protected IReadOnlyContext Context { get; private set; }
+        
+        protected virtual void InjectDependencies() { }
 
         protected virtual async UniTask OnInit()
         {
@@ -24,6 +26,8 @@ namespace Beton.Core.Features
         public async UniTask Init(IContext stateContext)
         {
             Context = stateContext;
+
+            InjectDependencies();
             
             await OnInit();
         }
@@ -31,6 +35,8 @@ namespace Beton.Core.Features
         public async UniTask Refresh(IContext prevStateContext, IContext newStateContext)
         {
             Context = newStateContext;
+
+            InjectDependencies();
             
             await OnRefresh();
         }
