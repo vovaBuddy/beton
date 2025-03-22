@@ -1,37 +1,53 @@
-﻿using Beton.Core.GameRunner;
+﻿using System;
+using Beton.Core.DependencyInjections;
+using Beton.Core.Features;
+using Beton.Core.GameStates;
 using UnityEngine;
 
 namespace Beton.Unity.GameRunner
 {
-    public abstract class MonoGameRunner<TGameRunner> : MonoBehaviour 
-        where TGameRunner : GameRunnerBase, new()
+    public abstract class MonoGameRunner : MonoBehaviour 
     {
-        private TGameRunner _gameRunner;
+        protected GameStateMachine _gameStateMachine;
+        protected IContext _globalContext;
+        
+        protected FeaturesStorage _featuresStorage = new();
+        
+        private GameStateMachineChangeStateRequester _changeStateRequester = new();
+        
+        protected abstract void SetupStates();
+
+        private void Construct()
+        {
+            _globalContext = new Context(null);
+            _globalContext.Set(_changeStateRequester);
+            _gameStateMachine = new GameStateMachine(_globalContext);
+        }
 
         private void Awake()
         {
-            _gameRunner = new TGameRunner();
-            _gameRunner.SetupStates();
+            Construct();
+            SetupStates();
         }
 
         private void Update()
         {
-            _gameRunner.Tick(Time.deltaTime);
+            _gameStateMachine.Tick(Time.deltaTime);
         }
         
         private void FixedUpdate()
         {
-            _gameRunner.FixedTick(Time.fixedDeltaTime);
+            _gameStateMachine.FixedTick(Time.deltaTime);
         }
         
         private void LateUpdate()
         {
-            _gameRunner.LateTick(Time.deltaTime);
+            _gameStateMachine.LateTick(Time.deltaTime);
         }
         
         private void OnDestroy()
         {
-            _gameRunner?.Dispose();
+            _globalContext?.Dispose();
         }
     }
 }
