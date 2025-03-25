@@ -6,7 +6,7 @@ namespace Beton.Services
     public static class GlobalContextProvider
     {
         public static bool IsReady { get; private set; } = false;
-        public static IContext GlobalContext { get; private set; } = null;
+        public static IReadOnlyContext GlobalContext { get; private set; } = null;
         
         private static readonly UniTaskCompletionSource _readyTaskCompletionSource = new();
     
@@ -17,16 +17,11 @@ namespace Beton.Services
             _readyTaskCompletionSource.TrySetResult(); 
         }
         
-        public static UniTask.Awaiter GetAwaiter()
-        {
-            return AwaitReady().GetAwaiter();
-        }
-
-        private static UniTask AwaitReady()
+        public static UniTask AwaitIsReady()
         {
             return IsReady 
                 ? UniTask.CompletedTask 
-                : _readyTaskCompletionSource.Task;
+                : _readyTaskCompletionSource.Task; 
         }
     }
 }
