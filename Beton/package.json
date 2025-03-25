@@ -10,6 +10,6 @@
 	"category": "Architecture",
 	"dependencies": {
 		"com.cysharp.unitask": "2.5.10",
-		"com.unity.addressables": "1.22.0"
+		"com.unity.addressables": "1.21.0"
 	}
 }
