@@ -1,21 +1,19 @@
 ﻿using System;
 using Beton.Core.DependencyInjections;
-using Beton.Core.Features;
 using Beton.Core.GameStates;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Beton.Unity.GameRunner
 {
     public abstract class MonoGameRunner : MonoBehaviour 
     {
-        protected GameStateMachine _gameStateMachine;
-        protected IContext _globalContext;
-        
-        protected FeaturesStorage _featuresStorage = new();
+        private GameStateMachine _gameStateMachine;
+        private IContext _globalContext;
         
         private GameStateMachineChangeStateRequester _changeStateRequester = new();
         
-        protected abstract void SetupStates();
+        protected abstract Type SetupStates();
 
         private void Construct()
         {
@@ -23,11 +21,22 @@ namespace Beton.Unity.GameRunner
             _globalContext.Set(_changeStateRequester);
             _gameStateMachine = new GameStateMachine(_globalContext);
         }
+        
+        protected void AddState<TState>() where TState : GameState
+        {
+            _gameStateMachine.AddState<TState>();
+        }
+        
+        protected void AddServiceInitializer<TServiceInitializer>() where TServiceInitializer : ServiceInitializer, new()
+        {
+            _gameStateMachine.AddServiceInitializer<TServiceInitializer>();
+        }
 
         private void Awake()
         {
             Construct();
-            SetupStates();
+            var initialStateType = SetupStates();
+            _gameStateMachine.SetInitialState(initialStateType).Forget();
         }
 
         private void Update()

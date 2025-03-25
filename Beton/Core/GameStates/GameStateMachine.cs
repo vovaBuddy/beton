@@ -2,15 +2,20 @@
 using System;
 using System.Collections.Generic;
 using Beton.Core.DependencyInjections;
+using Beton.Core.Features;
+using Beton.Services;
 using Cysharp.Threading.Tasks;
 
 namespace Beton.Core.GameStates
 {
-    public class GameStateMachine
+    public class GameStateMachine : IDisposable
     {
         private readonly Dictionary<Type, GameState> _states = new();
+        private readonly FeaturesStorage _featuresStorage = new();
+        private readonly List<ServiceInitializer> _serviceInitializers = new();
 
         private GameState _currentState = default!;
+        private IContext _globalContext;
         
         private readonly GameStateMachineChangeStateRequester _changeStateRequester;
         
@@ -18,18 +23,36 @@ namespace Beton.Core.GameStates
 
         public GameStateMachine(IContext globalContext)
         {
+            _globalContext = globalContext;
             _changeStateRequester = globalContext.Get<GameStateMachineChangeStateRequester>();
             _isBusy = true;
         }
         
-        public void AddState(GameState state)
+        public void AddState<TState>() where TState : GameState
         {
-            _states.Add(state.GetType(), state);
+            var type = typeof(TState);
+            var args = new object[] { _globalContext, _featuresStorage };
+            var instance = (TState) Activator.CreateInstance(type, args);
+            _states.Add(type, instance);
+        }
+        
+        public void AddServiceInitializer<TServiceInitializer>() where TServiceInitializer : ServiceInitializer, new()
+        {
+            ServiceInitializer initializer = new TServiceInitializer();
+            initializer.SetGlobalContext(_globalContext);
+            _serviceInitializers.Add(initializer);
         }
 
         public async UniTask SetInitialState(Type initialStateType)
         {
             _isBusy = true;
+
+            foreach (var serviceInitializer in _serviceInitializers)
+            {
+                await serviceInitializer.Init();
+            }
+            
+            GlobalContextProvider.SetGlobalContext(_globalContext);
             
             var initialState = _states[initialStateType];
             
@@ -171,6 +194,16 @@ namespace Beton.Core.GameStates
             
             _currentState = nextState;
             _isBusy = false;
+        }
+
+        public void Dispose()
+        {
+            foreach (var serviceInitializer in _serviceInitializers)
+            {
+                serviceInitializer.Dispose();
+            }
+
+            _featuresStorage.Dispose();
         }
     }
 }
