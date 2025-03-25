@@ -1,7 +1,7 @@
 ﻿using Beton.Core.DependencyInjections;
 using Cysharp.Threading.Tasks;
 
-namespace Beton.Services
+namespace Beton.Core.DependencyInjections
 {
     public static class GlobalContextProvider
     {

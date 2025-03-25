@@ -1,6 +1,7 @@
 ﻿using System;
 using Beton.Core.DependencyInjections;
 using Beton.Core.GameStates;
+using Beton.Core.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 

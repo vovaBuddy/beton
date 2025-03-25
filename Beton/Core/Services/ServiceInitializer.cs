@@ -1,9 +1,8 @@
 using System;
-using Beton.Beton.Core.Services;
 using Beton.Core.DependencyInjections;
 using Cysharp.Threading.Tasks;
 
-namespace Beton.Core.GameStates
+namespace Beton.Core.Services
 {
     public abstract class ServiceInitializer : IDisposable
     {

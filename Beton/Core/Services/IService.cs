@@ -1,4 +1,4 @@
-﻿namespace Beton.Beton.Core.Services
+﻿namespace Beton.Core.Services
 {
     public interface IService
     {

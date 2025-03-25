@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Beton.Core.DependencyInjections;
 using Beton.Core.Features;
-using Beton.Services;
+using Beton.Core.Services;
 using Cysharp.Threading.Tasks;
 
 namespace Beton.Core.GameStates
