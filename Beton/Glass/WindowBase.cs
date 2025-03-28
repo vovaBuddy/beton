@@ -1,0 +1,21 @@
+﻿namespace Beton.Glass
+{
+    public abstract class WindowBase<TView, TViewModel, TViewData> : IWindow
+        where TView : View<TViewModel>
+        where TViewModel : ViewModel<TViewData>
+    {
+        public TView View { get; set; }
+        public TViewModel ViewModel { get; set; }
+        
+        protected virtual void OnConstruct()
+        { }
+        
+        public void Construct(TView view, TViewModel viewModel)
+        {
+            View = view;
+            ViewModel = viewModel;
+
+            OnConstruct();
+        }
+    }
+}

@@ -56,6 +56,11 @@ namespace Beton.Core.GameStates
             
             var initialState = _states[initialStateType];
             
+            foreach (var serviceInitializer in _serviceInitializers)
+            {
+                serviceInitializer.TrySetGameStateContext(initialState.Context);
+            }
+            
             foreach (var initializer in initialState.Initializers)
             {
                 await initializer.Init(initialState.Context);
@@ -150,6 +155,11 @@ namespace Beton.Core.GameStates
             }
             
             // Refresh all initializers that are present in the next state
+            foreach (var serviceInitializer in _serviceInitializers)
+            {
+                serviceInitializer.TrySetGameStateContext(nextState.Context);
+            }
+            
             foreach (var initializer in previousState.Initializers)
             {
                 if (!nextState.HasFeature(initializer.GetType()))

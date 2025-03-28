@@ -6,12 +6,35 @@ namespace Beton.Core.Services
 {
     public abstract class ServiceInitializer : IDisposable
     {
-        protected IService Service { get; set; }
+        protected IService Service
+        {
+            get => _service;
+            set
+            {
+                _service = value;
+                if(_service is IServiceWithGameStateContext serviceWithGameStateContext)
+                {
+                    _serviceWithGameStateContext = serviceWithGameStateContext;
+                }
+            }
+        }
+
         protected IContext Context { get; set; }
+
+        private IService _service;
+        private IServiceWithGameStateContext _serviceWithGameStateContext;
         
         public void SetGlobalContext(IContext globalContext)
         {
             Context = globalContext;
+        }
+        
+        public void TrySetGameStateContext(IReadOnlyContext gameStateContext)
+        {
+            if(_serviceWithGameStateContext != null)
+            {
+                _serviceWithGameStateContext.GameStateContext = gameStateContext;
+            }
         }
         
         protected virtual void InjectDependencies() { }
