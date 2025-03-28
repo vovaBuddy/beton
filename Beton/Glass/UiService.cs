@@ -6,7 +6,8 @@ using UnityEngine.AddressableAssets;
 
 namespace Beton.Glass
 {
-    public abstract class UiServiceBase<TWindowConfig> : IServiceWithGameStateContext where TWindowConfig : class
+    public abstract class UiServiceBase<TWindowConfig> : IServiceWithGameStateContext 
+        where TWindowConfig : class, IWindowConfig
     {
         public IReadOnlyContext GameStateContext { get; set; }
         
@@ -27,12 +28,11 @@ namespace Beton.Glass
             where TWindow : WindowBase<TWindowView, TWindowViewModel, TWindowData>, new()
         {
             var id = new WindowId();
-            
-            
             var go = await windowPrefab.InstantiateAsync().Task;
             
             var viewModel = new TWindowViewModel();
             viewModel.Construct(GameStateContext);
+            
             var view = go.GetComponent<TWindowView>();
             view.gameObject.SetActive(false);
             view.Construct(Context);
