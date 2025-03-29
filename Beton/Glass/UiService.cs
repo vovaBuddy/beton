@@ -3,6 +3,7 @@ using Beton.Core.DependencyInjections;
 using Beton.Core.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Beton.Glass
 {
@@ -33,7 +34,16 @@ namespace Beton.Glass
             where TWindow : WindowBase<TWindowView, TWindowViewModel, TWindowData>, new()
         {
             var id = new WindowId();
-            var go = await windowPrefab.InstantiateAsync().Task;
+            var handle = windowPrefab.InstantiateAsync();
+            handle.Completed += h =>
+            {
+                if (h.Status == AsyncOperationStatus.Succeeded)
+                {
+                    var view = h.Result.GetComponent<TWindowView>();
+                    view.CanvasGroup.alpha = 0;
+                }
+            };
+            var go = await handle.Task;
             
             var viewModel = new TWindowViewModel();
             viewModel.Construct(GameStateContext);
@@ -60,7 +70,7 @@ namespace Beton.Glass
             }
             else
             {
-                view.gameObject.SetActive(true);
+                view.CanvasGroup.alpha = 1;
             }
             
             return id;
