@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Beton.Glass
 {
-    public abstract class WindowView<TViewModel> : View<TViewModel>
+    public abstract class WindowView<TViewModel> : View<TViewModel>, IWindowView
         where TViewModel : IWindowViewModel
     {
         [SerializeField] protected List<Button> _closeButtons;
