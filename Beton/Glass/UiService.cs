@@ -21,6 +21,11 @@ namespace Beton.Glass
             WindowsConfigs = context.Get<TWindowConfig>();
         }
         
+        public bool IsSpawned(WindowId id)
+        {
+            return SpawnedWindows.ContainsKey(id);
+        }
+        
         public async UniTask<WindowId> CreateWindow<TWindow, TWindowView, TWindowViewModel, TWindowData>(
             TWindowData data, AssetReferenceGameObject windowPrefab) 
             where TWindowViewModel : WindowViewModel<TWindowData>, new() 
