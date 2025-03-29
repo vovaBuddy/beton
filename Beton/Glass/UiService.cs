@@ -23,8 +23,8 @@ namespace Beton.Glass
         
         public async UniTask<WindowId> CreateWindow<TWindow, TWindowView, TWindowViewModel, TWindowData>(
             TWindowData data, AssetReferenceGameObject windowPrefab) 
-            where TWindowViewModel : ViewModel<TWindowData>, new() 
-            where TWindowView : View<TWindowViewModel>
+            where TWindowViewModel : WindowViewModel<TWindowData>, new() 
+            where TWindowView : WindowView<TWindowViewModel>
             where TWindow : WindowBase<TWindowView, TWindowViewModel, TWindowData>, new()
         {
             var id = new WindowId();
@@ -32,10 +32,15 @@ namespace Beton.Glass
             
             var viewModel = new TWindowViewModel();
             viewModel.Construct(GameStateContext);
+            viewModel.CloseWindow = () => DestroyWindow<TWindow, TWindowView, TWindowViewModel, TWindowData>(id);
             
             var view = go.GetComponent<TWindowView>();
-            view.gameObject.SetActive(false);
             view.Construct(Context);
+            
+            if (view.WindowActivator != null)
+            {
+                await view.WindowActivator.OnSpawn();
+            }
 
             var window = new TWindow();
             window.Construct(view, viewModel);
@@ -43,15 +48,22 @@ namespace Beton.Glass
                 
             viewModel.Init(data);
             view.Init(viewModel);
-            //todo: тут можно добавить анимацию появления
-            view.gameObject.SetActive(true);
+           
+            if (view.WindowActivator != null)
+            {
+                await view.WindowActivator.Show();
+            }
+            else
+            {
+                view.gameObject.SetActive(true);
+            }
             
             return id;
         }
         
-        public void DestroyWindow<TWindow, TWindowView, TWindowViewModel, TWindowData>(WindowId id)
-            where TWindowViewModel : ViewModel<TWindowData>, new() 
-            where TWindowView : View<TWindowViewModel>
+        public async void DestroyWindow<TWindow, TWindowView, TWindowViewModel, TWindowData>(WindowId id)
+            where TWindowViewModel : WindowViewModel<TWindowData>, new() 
+            where TWindowView : WindowView<TWindowViewModel>
             where TWindow : WindowBase<TWindowView, TWindowViewModel, TWindowData>, new()
         {
             if (id == null)
@@ -69,7 +81,10 @@ namespace Beton.Glass
                 return;
             }
             
-            //ToDo: можно обернуть все в анимацию закрытия, и в конце вызвать Deinit и Dispose
+            if (window.View.WindowActivator != null)
+            {
+                await window.View.WindowActivator.Hide();
+            }
             
             window.View.Deinit();
             window.View.Dispose();

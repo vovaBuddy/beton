@@ -16,4 +16,24 @@ namespace Beton.Core.DependencyInjections
     {
         T Get<T>() where T : class;
     }
+
+    public interface IGlobalWritableContext : IContext
+    {
+        
+    }
+    
+    public interface IGlobalContext : IReadOnlyContext
+    {
+        
+    }
+    
+    public interface IGameStateWritableContext : IContext
+    {
+        
+    }
+    
+    public interface IGameStateContext : IReadOnlyContext
+    {
+        
+    }
 }

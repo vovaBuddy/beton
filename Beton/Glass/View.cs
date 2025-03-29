@@ -14,6 +14,9 @@ namespace Beton.Glass
         private List<Action> _unbindActions = new();
         
         protected virtual void InjectDependencies() { }
+        protected virtual void OnInit(TViewModel viewModel) { }
+        internal virtual void OnInitInternal(TViewModel viewModel) { }
+        protected virtual void OnConstruct() { }
         protected virtual void OnDeinit() { }
         protected virtual void OnDispose() { }
 
@@ -22,11 +25,15 @@ namespace Beton.Glass
             Context = context;
             
             InjectDependencies();
+            
+            OnConstruct();
         }
         
-        public virtual void Init(TViewModel viewModel)
+        public void Init(TViewModel viewModel)
         {
+            OnInitInternal(viewModel);
             
+            OnInit(viewModel);
         }
         
         public void Deinit()
@@ -59,6 +66,14 @@ namespace Beton.Glass
             _unbindActions.Add(() => button.onClick.RemoveListener(action.Invoke));
         }
         
+        protected void Bind(List<Button> buttons, ReactiveCommand action)
+        {
+            foreach (var button in buttons)
+            {
+                Bind(button, action);
+            }
+        }
+        
         protected void Bind(Toggle toggle, Action callback, bool setOn = false)
         {
             void ToggleCallback(bool isOn)
@@ -83,6 +98,14 @@ namespace Beton.Glass
         {
             action.Subscribe(callback);
             _unbindActions.Add(() => action.Unsubscribe(callback));
+        }
+        
+        protected void Bind(List<Button> buttons, Action action)
+        {
+            foreach (var button in buttons)
+            {
+                Bind(button, action);
+            }
         }
         
         protected void Bind<TData>(ReactiveCommand<TData> action, Action<TData> callback)
