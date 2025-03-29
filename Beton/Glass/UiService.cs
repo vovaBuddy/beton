@@ -42,21 +42,21 @@ namespace Beton.Glass
             var view = go.GetComponent<TWindowView>();
             view.Construct(Context);
             
-            if (view.WindowActivator != null)
-            {
-                await view.WindowActivator.OnSpawn();
-            }
-
             var window = new TWindow();
             window.Construct(view, viewModel);
             SpawnedWindows.Add(id, window);
-                
+            
+            if (window.WindowActivator != null)
+            {
+                await window.WindowActivator.OnSpawn();
+            }
+            
             viewModel.Init(data);
             view.Init(viewModel);
            
-            if (view.WindowActivator != null)
+            if (window.WindowActivator != null)
             {
-                await view.WindowActivator.Show();
+                await window.WindowActivator.Show();
             }
             else
             {
@@ -86,9 +86,9 @@ namespace Beton.Glass
                 return;
             }
             
-            if (window.View.WindowActivator != null)
+            if (window.WindowActivator != null)
             {
-                await window.View.WindowActivator.Hide();
+                await window.WindowActivator.Hide();
             }
             
             window.View.Deinit();

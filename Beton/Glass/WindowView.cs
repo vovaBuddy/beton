@@ -12,8 +12,6 @@ namespace Beton.Glass
         
         public CanvasGroup CanvasGroup => _canvasGroup;
 
-        public IWindowActivator WindowActivator;
-
         internal override void OnInitInternal(TViewModel viewModel)
         {
             Bind(_closeButtons, viewModel.CloseWindow);

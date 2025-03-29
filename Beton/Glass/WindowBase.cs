@@ -7,6 +7,8 @@
         public TView View { get; set; }
         public TViewModel ViewModel { get; set; }
         
+        public IWindowActivator WindowActivator  { get; set; }
+        
         protected virtual void OnConstruct()
         { }
         
