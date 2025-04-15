@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Beton.Glass
 {
-    public abstract class View<TViewModel> : MonoBehaviour
+    public abstract class View<TViewModel> : MonoBehaviour, IView
     {
         protected IReadOnlyContext Context;
         private List<Action> _unbindActions = new();
@@ -16,8 +16,11 @@ namespace Beton.Glass
         protected virtual void InjectDependencies() { }
         protected virtual void OnInit(TViewModel viewModel) { }
         internal virtual void OnInitInternal(TViewModel viewModel) { }
+        protected virtual void ConstructChildren() { }
         protected virtual void OnConstruct() { }
+        protected virtual void DeinitChildren() { }
         protected virtual void OnDeinit() { }
+        protected virtual void DisposeChildren() { }
         protected virtual void OnDispose() { }
 
         public void Construct(IReadOnlyContext context)
@@ -25,6 +28,8 @@ namespace Beton.Glass
             Context = context;
             
             InjectDependencies();
+            
+            ConstructChildren();
             
             OnConstruct();
         }
@@ -40,14 +45,18 @@ namespace Beton.Glass
         {
             OnDeinit();
             
+            DeinitChildren();
+            
             UnbindAll();
         }
         
         public void Dispose()
         {
+            UnbindAll();
+            
             OnDispose();
             
-            UnbindAll();
+            DisposeChildren();
         }
         
         public void UnbindAll()
