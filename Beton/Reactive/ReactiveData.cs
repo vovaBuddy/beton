@@ -25,6 +25,16 @@ namespace Beton.Reactive
             _data = data;
         }
         
+        public void SetWithoutNotify(TData data)
+        {
+            _data = data;
+        }
+        
+        public void Notify()
+        {
+            Invoke();
+        }
+        
         public void Subscribe(Action<TData> action, bool invokeImmediately = true)
         {
             _subscribers.Add(action);
